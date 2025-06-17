@@ -1,14 +1,7 @@
 # Housing Project - MCR Form
 
-A web application for managing Manual Check Request (MCR) forms for housing assistance programs.
+Application for managing Manual Check Request (MCR) forms for Housing.
 
-## Features
-
-- Interactive MCR form with dynamic calculations
-- Signature capture functionality
-- Prorated amount calculations
-- Form validation
-- Responsive design
 
 ## Tech Stack
 
