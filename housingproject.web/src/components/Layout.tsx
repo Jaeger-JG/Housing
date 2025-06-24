@@ -32,7 +32,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onFormSelect }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Housing Department Forms
+            City of Vallejo Housing Department Forms
           </Typography>
         </Toolbar>
       </AppBar>
