@@ -1,0 +1,79 @@
+/* Sidebar Menu Styles - Inspired by cg-sidebar-slide-out-menu */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(110%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(110%);
+  }
+}
+
+.sidebar-toggle {
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+}
+
+.sidebar-toggle:hover {
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+}
+
+.sidebar-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-card:hover {
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.sidebar-card.slide-in {
+  animation: slideInFromRight 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.sidebar-card.slide-out {
+  animation: slideOutToRight 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.background-blur {
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .sidebar-toggle {
+    width: 200px !important;
+    height: 120px !important;
+  }
+  
+  .sidebar-card {
+    padding: 1em !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar-toggle {
+    width: 180px !important;
+    height: 100px !important;
+    margin: 0.5em !important;
+  }
+} 

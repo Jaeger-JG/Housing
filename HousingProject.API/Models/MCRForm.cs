@@ -2,9 +2,23 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HousingProject.API.Models;
 
+public enum MCRFormStatus
+{
+    Pending,
+    Approved,
+    Rejected,
+    InReview
+}
+
 public class MCRForm
 {
     public int Id { get; set; }
+    
+    // Foreign key to the Forms table
+    public int FormId { get; set; }
+    
+    // Navigation property back to the parent Form
+    public Form? Form { get; set; }
     
     [Required]
     public string HousingSpecialistName { get; set; } = string.Empty;
@@ -90,5 +104,27 @@ public class MCRForm
     // Metadata
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
-    public string Status { get; set; } = "Pending";
+    
+    // Status field with enum support
+    public MCRFormStatus Status { get; set; } = MCRFormStatus.Pending;
+    
+    // For backward compatibility and JSON serialization
+    public string StatusString => Status.ToString();
+    
+    // Helper method to safely convert string status to enum
+    public static MCRFormStatus ParseStatus(string status)
+    {
+        if (string.IsNullOrEmpty(status))
+            return MCRFormStatus.Pending;
+            
+        return status.ToLower() switch
+        {
+            "pending" => MCRFormStatus.Pending,
+            "approved" => MCRFormStatus.Approved,
+            "rejected" => MCRFormStatus.Rejected,
+            "inreview" => MCRFormStatus.InReview,
+            "in review" => MCRFormStatus.InReview,
+            _ => MCRFormStatus.Pending
+        };
+    }
 } 

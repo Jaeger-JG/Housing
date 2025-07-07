@@ -1,0 +1,13 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=HOUSING-FORMS\\SQLEXPRESS;Database=Housing;Trusted_Connection=True;TrustServerCertificate=True;"
+  },
+  "SMTP": {
+    "Server": "192.168.10.172",
+    "Port": 587,
+    "Username": "admin.grier",
+    "Password": "JustinRebeca_2011",
+    "FromEmail": "justin.grier@cityofvallejo.net",
+    "NotificationRecipients": "justin.grier@cityofvallejo.net"
+  }
+}

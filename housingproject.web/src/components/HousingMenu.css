@@ -1,0 +1,232 @@
+/* Housing Menu Styles - Inspired by cg-next-navigation */
+.housing-menu-container {
+  position: relative;
+  z-index: 1000;
+}
+
+.housing-menu-bar,
+.housing-menu-overlay-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+.housing-menu-bar a,
+.housing-menu-open p {
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.housing-menu-close p {
+  color: #667eea;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.housing-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  padding: 2em;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 1001;
+  display: flex;
+  transform: translateY(-100%);
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-sizing: border-box;
+}
+
+.housing-menu-overlay.open {
+  transform: translateY(0);
+}
+
+.housing-menu-close-icon {
+  flex: 2;
+  display: flex;
+  align-items: flex-end;
+  cursor: pointer;
+}
+
+.housing-menu-copy {
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 2em;
+}
+
+.housing-menu-preview {
+  flex: 4;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.housing-menu-close-icon p {
+  font-size: 100px;
+  color: rgba(255, 255, 255, 0.1);
+  line-height: 70%;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  margin: 0;
+}
+
+.housing-menu-link-item {
+  width: max-content;
+  overflow: hidden;
+  margin-bottom: 1.5em;
+}
+
+.housing-menu-link-item-holder {
+  position: relative;
+  transform: translateY(0);
+  transition: transform 0.3s ease;
+}
+
+.housing-menu-link-item-holder:hover {
+  transform: translateY(-5px);
+}
+
+.housing-menu-link-item-holder a {
+  color: #fff;
+  font-size: 60px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 85%;
+  font-family: 'Roboto', sans-serif;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.housing-menu-link-item-holder a:hover {
+  color: #e3f2fd;
+}
+
+.housing-menu-info {
+  display: flex;
+  margin-top: 2em;
+}
+
+.housing-menu-info-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.housing-menu-info-col p {
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 0.5em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.housing-menu-preview p {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.housing-menu-logo span {
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #fff;
+}
+
+/* Animation for menu items */
+.housing-menu-overlay.open .housing-menu-link-item {
+  animation: slideInUp 0.6s ease forwards;
+}
+
+.housing-menu-overlay.open .housing-menu-link-item:nth-child(1) { animation-delay: 0.1s; }
+.housing-menu-overlay.open .housing-menu-link-item:nth-child(2) { animation-delay: 0.2s; }
+.housing-menu-overlay.open .housing-menu-link-item:nth-child(3) { animation-delay: 0.3s; }
+.housing-menu-overlay.open .housing-menu-link-item:nth-child(4) { animation-delay: 0.4s; }
+.housing-menu-overlay.open .housing-menu-link-item:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .housing-menu-close-icon {
+    display: none;
+  }
+
+  .housing-menu-copy {
+    padding-top: 8em;
+  }
+
+  .housing-menu-link-item-holder a {
+    font-size: 40px;
+  }
+
+  .housing-menu-info {
+    flex-direction: column;
+  }
+
+  .housing-menu-info-col {
+    margin-bottom: 1em;
+  }
+}
+
+@media (max-width: 600px) {
+  .housing-menu-bar,
+  .housing-menu-overlay-bar {
+    padding: 1em;
+  }
+
+  .housing-menu-overlay {
+    padding: 1em;
+  }
+
+  .housing-menu-link-item-holder a {
+    font-size: 32px;
+  }
+
+  .housing-menu-logo span {
+    font-size: 16px;
+  }
+} 

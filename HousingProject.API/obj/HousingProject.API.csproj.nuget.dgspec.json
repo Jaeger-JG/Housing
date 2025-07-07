@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\justin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj": {}
+    "C:\\Users\\admin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\justin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj": {
+    "C:\\Users\\admin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\justin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj",
+        "projectUniqueName": "C:\\Users\\admin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj",
         "projectName": "HousingProject.API",
-        "projectPath": "C:\\Users\\justin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj",
-        "packagesPath": "C:\\Users\\justin.grier\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\justin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\obj\\",
+        "projectPath": "C:\\Users\\admin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj",
+        "packagesPath": "C:\\Users\\admin.grier\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\admin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\justin.grier\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\admin.grier\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -59,10 +59,6 @@
             "Microsoft.EntityFrameworkCore.Tools": {
               "target": "Package",
               "version": "[9.0.6, )"
-            },
-            "System.Net.Mail": {
-              "target": "Package",
-              "version": "[1.0.0, )"
             }
           },
           "imports": [

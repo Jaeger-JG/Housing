@@ -4774,24 +4774,23 @@
       "Microsoft.AspNetCore.OpenApi >= 9.0.6",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.6",
       "Microsoft.EntityFrameworkCore.SqlServer >= 9.0.6",
-      "Microsoft.EntityFrameworkCore.Tools >= 9.0.6",
-      "System.Net.Mail >= 1.0.0"
+      "Microsoft.EntityFrameworkCore.Tools >= 9.0.6"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\justin.grier\\.nuget\\packages\\": {}
+    "C:\\Users\\admin.grier\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\justin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj",
+      "projectUniqueName": "C:\\Users\\admin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj",
       "projectName": "HousingProject.API",
-      "projectPath": "C:\\Users\\justin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj",
-      "packagesPath": "C:\\Users\\justin.grier\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\justin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\obj\\",
+      "projectPath": "C:\\Users\\admin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\HousingProject.API.csproj",
+      "packagesPath": "C:\\Users\\admin.grier\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\admin.grier\\Desktop\\MCR\\Housing\\HousingProject.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\justin.grier\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\admin.grier\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -4836,10 +4835,6 @@
           "Microsoft.EntityFrameworkCore.Tools": {
             "target": "Package",
             "version": "[9.0.6, )"
-          },
-          "System.Net.Mail": {
-            "target": "Package",
-            "version": "[1.0.0, )"
           }
         },
         "imports": [
@@ -4864,16 +4859,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1102",
-      "level": "Error",
-      "message": "Unable to find package System.Net.Mail with version (>= 1.0.0)\r\n  - Found 2 version(s) in nuget.org [ Nearest version: 1.0.0-rtm-00002 ]",
-      "libraryId": "System.Net.Mail",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    }
-  ]
+  }
 }
