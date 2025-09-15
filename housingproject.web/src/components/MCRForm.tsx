@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { 
   Box, 
   TextField, 
@@ -12,14 +12,11 @@ import {
   Alert, 
   Snackbar,
   Paper,
-  Container,
   Divider
 } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import SignatureCanvas from 'react-signature-canvas';
 import { 
-  Description, 
   Person, 
   Home, 
   Business, 
@@ -36,15 +33,16 @@ const mcrTypes = [
   'Both HAP and Tenant Portion'
 ];
 
-const housingSpecialists = [
-  'Maria Munoz',
-  'Rosanna Roldan',
-  'Chevonne Dozier',
-  'Kalunga Mumba',
-  'Kristin Upshaw',
-  'Ashley Johnson',
-  'Allecca Consultants'
-];
+// Helper function to convert username to proper name format
+const formatUsernameToName = (username: string): string => {
+  if (!username) return '';
+  
+  // Split by dots and capitalize each part
+  const parts = username.split('.');
+  return parts
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+};
 
 const programTypes = [
   'VASH',
@@ -52,7 +50,21 @@ const programTypes = [
   'HCV'
 ];
 
-const MCRForm: React.FC = () => {
+interface MCRFormProps {
+  editingFormData?: any;
+  onFormSubmitted?: () => void;
+  onNavigateToDashboard?: () => void;
+  onNavigateToFormsList?: () => void;
+  onLogout?: () => void;
+}
+
+const MCRForm: React.FC<MCRFormProps> = ({ 
+  editingFormData, 
+  onFormSubmitted, 
+  onNavigateToDashboard, 
+  onNavigateToFormsList, 
+  onLogout 
+}) => {
   // Form state
   const [housingSpecialistName, setHousingSpecialistName] = useState('');
   const [housingSpecialistEmail, setHousingSpecialistEmail] = useState('');
@@ -63,11 +75,12 @@ const MCRForm: React.FC = () => {
   const [ownerAccountNumber, setOwnerAccountNumber] = useState('');
   const [addressLine1, setAddressLine1] = useState('');
   const [addressLine2, setAddressLine2] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
+  const [city, setCity] = useState('Vallejo');
+  const [state, setState] = useState('California');
   const [zipCode, setZipCode] = useState('');
   const [landlordFirstName, setLandlordFirstName] = useState('');
   const [landlordLastName, setLandlordLastName] = useState('');
+  const [entityName, setEntityName] = useState('');
   const [effectiveDate, setEffectiveDate] = useState<Date | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -81,7 +94,6 @@ const MCRForm: React.FC = () => {
   const [vacateDate, setVacateDate] = useState<Date | null>(null);
   const [hapAmount, setHapAmount] = useState<string>('');
   const [proratedAmount, setProratedAmount] = useState<number | null>(null);
-  const signatureRef = useRef<SignatureCanvas>(null);
 
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -91,7 +103,7 @@ const MCRForm: React.FC = () => {
     severity: 'success'
   });
 
-  const calculateProratedAmount = () => {
+  const calculateProratedAmount = useCallback(() => {
     if (!hapAmount || !vacateDate) {
       setProratedAmount(null);
       return;
@@ -110,30 +122,99 @@ const MCRForm: React.FC = () => {
     const calculatedAmount = dailyRate * daysToPay;
     
     setProratedAmount(Number(calculatedAmount.toFixed(2)));
-  };
+  }, [hapAmount, vacateDate]);
 
   useEffect(() => {
     calculateProratedAmount();
-  }, [hapAmount, vacateDate]);
+  }, [calculateProratedAmount]);
+
+  // Auto-populate housing specialist fields based on logged-in user
+  useEffect(() => {
+    const username = localStorage.getItem('username');
+    if (username) {
+      const formattedName = formatUsernameToName(username);
+      const email = `${username}@cityofvallejo.net`;
+      setHousingSpecialistName(formattedName);
+      setHousingSpecialistEmail(email);
+    }
+  }, []);
+
+  // Populate form with editing data when editingFormData is provided
+  useEffect(() => {
+    if (editingFormData) {
+      console.log('Populating form with editing data:', editingFormData);
+      
+      // Map API field names to form state
+      setTenantName(editingFormData.tenantName || '');
+      setAddressLine1(editingFormData.addressLine1 || '');
+      setAddressLine2(editingFormData.addressLine2 || '');
+      setCity(editingFormData.city || 'Vallejo');
+      setState(editingFormData.state || 'California');
+      setZipCode(editingFormData.zipCode || '');
+      setLandlordFirstName(editingFormData.landlordFirstName || '');
+      setLandlordLastName(editingFormData.landlordLastName || '');
+      setEntityName(editingFormData.entityName || '');
+      setOwnerAccountNumber(editingFormData.ownerAccountNumber || '');
+      setProgramType(editingFormData.programType || '');
+      setLastFourSSN(editingFormData.lastFourSSN || '');
+      setMcrType(editingFormData.mcrType || '');
+      setHapAmount(editingFormData.hapAmount?.toString() || '');
+      setProratedAmount(editingFormData.proratedAmount || null);
+      setReasonComments(editingFormData.reasonComments || '');
+      setDescription(editingFormData.description || '');
+      setSelectedType(editingFormData.selectedType || '');
+      setThirdPartyPaymentsVerified(editingFormData.thirdPartyPaymentsVerified || false);
+      setTransactionScreenVerified(editingFormData.transactionScreenVerified || false);
+      setOverlappingHAP(editingFormData.overlappingHAP || false);
+      
+      // Set dates - handle both string and Date objects
+      if (editingFormData.effectiveDate) {
+        setEffectiveDate(new Date(editingFormData.effectiveDate));
+      }
+      if (editingFormData.startDate) {
+        setStartDate(new Date(editingFormData.startDate));
+      }
+      if (editingFormData.endDate) {
+        setEndDate(new Date(editingFormData.endDate));
+      }
+      if (editingFormData.dateIntendedToVacate) {
+        setVacateDate(new Date(editingFormData.dateIntendedToVacate));
+      }
+      
+      // Set the submission date
+      if (editingFormData.date) {
+        setDate(new Date(editingFormData.date));
+      }
+      
+      // Set housing specialist info (these should be read-only but populate for consistency)
+      if (editingFormData.housingSpecialistName) {
+        setHousingSpecialistName(editingFormData.housingSpecialistName);
+      }
+      if (editingFormData.housingSpecialistEmail) {
+        setHousingSpecialistEmail(editingFormData.housingSpecialistEmail);
+      }
+    }
+  }, [editingFormData]);
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedType(event.target.value);
   };
 
-  const clearSignature = () => {
-    signatureRef.current?.clear();
-  };
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     
     console.log('Form submission started');
+
+    // Check landlord information validation
+    const hasEntityName = entityName.trim() !== '';
+    const hasLandlordName = landlordFirstName.trim() !== '' && landlordLastName.trim() !== '';
     
-    // Check if signature is empty (the logic was inverted)
-    if (signatureRef.current?.isEmpty()) {
+    if (!hasEntityName && !hasLandlordName) {
       setSnackbar({
         open: true,
-        message: 'Please provide a signature before submitting.',
+        message: 'Please provide either Entity Name or both Landlord First Name and Last Name.',
         severity: 'error'
       });
       return;
@@ -143,19 +224,6 @@ const MCRForm: React.FC = () => {
     console.log('Form is submitting...');
 
     try {
-      // Fix the signature capture issue
-      let signatureData = '';
-      if (signatureRef.current && !signatureRef.current.isEmpty()) {
-        try {
-          // Use the regular canvas method instead of trimmed canvas
-          signatureData = signatureRef.current.getCanvas().toDataURL('image/png');
-        } catch (error) {
-          console.warn('Could not get canvas data:', error);
-          signatureData = '';
-        }
-      }
-      
-      console.log('Signature captured:', signatureData ? 'Yes' : 'No');
 
       const formData = {
         // Remove any properties that might cause validation issues
@@ -173,6 +241,7 @@ const MCRForm: React.FC = () => {
         ZipCode: zipCode,
         LandlordFirstName: landlordFirstName,
         LandlordLastName: landlordLastName,
+        EntityName: entityName,
         EffectiveDate: effectiveDate?.toISOString(),
         StartDate: startDate?.toISOString(),
         EndDate: endDate?.toISOString(),
@@ -185,16 +254,22 @@ const MCRForm: React.FC = () => {
         Description: description,
         DateIntendedToVacate: vacateDate?.toISOString(),
         HAPAmount: parseFloat(hapAmount) || 0,
-        ProratedAmount: proratedAmount,
-        SignatureData: signatureData
+        ProratedAmount: proratedAmount
       };
 
       console.log('Form data prepared:', formData);
-      console.log('Sending request to: /api/MCR');
+      
+      // Determine if we're editing an existing form or creating a new one
+      const isEditing = editingFormData && editingFormData.id;
+      const url = isEditing 
+        ? `https://housing-forms.cityofvallejo.net/api/MCR/${editingFormData.id}`
+        : 'https://housing-forms.cityofvallejo.net/api/MCR';
+      const method = isEditing ? 'PUT' : 'POST';
+      
+      console.log(`Sending ${method} request to: ${url}`);
 
-      // Production deployment with relative URLs
-      const response = await fetch('/api/MCR', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -208,10 +283,15 @@ const MCRForm: React.FC = () => {
         console.log('Form submitted successfully');
         setSnackbar({
           open: true,
-          message: 'MCR form submitted successfully!',
+          message: isEditing ? 'MCR form updated successfully!' : 'MCR form submitted successfully!',
           severity: 'success'
         });
         resetForm();
+        
+        // Call the onFormSubmitted callback if provided (for editing mode)
+        if (onFormSubmitted) {
+          onFormSubmitted();
+        }
       } else {
         const errorText = await response.text();
         console.error('Failed to submit form:', response.status, errorText);
@@ -234,8 +314,7 @@ const MCRForm: React.FC = () => {
   };
 
   const resetForm = () => {
-    setHousingSpecialistName('');
-    setHousingSpecialistEmail('');
+    // Don't reset housing specialist fields - they should always be based on logged-in user
     setDate(new Date());
     setProgramType('');
     setLastFourSSN('');
@@ -243,11 +322,12 @@ const MCRForm: React.FC = () => {
     setOwnerAccountNumber('');
     setAddressLine1('');
     setAddressLine2('');
-    setCity('');
-    setState('');
+    setCity('Vallejo');
+    setState('California');
     setZipCode('');
     setLandlordFirstName('');
     setLandlordLastName('');
+    setEntityName('');
     setEffectiveDate(null);
     setStartDate(null);
     setEndDate(null);
@@ -261,7 +341,6 @@ const MCRForm: React.FC = () => {
     setVacateDate(null);
     setHapAmount('');
     setProratedAmount(null);
-    clearSignature();
   };
 
   const handleCloseSnackbar = () => {
@@ -277,7 +356,11 @@ const MCRForm: React.FC = () => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       {/* Navbar */}
-      <Navbar onLogout={handleLogout} />
+      <Navbar 
+        onLogout={onLogout || handleLogout} 
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToFormsList={onNavigateToFormsList}
+      />
       
       <Box sx={{ 
         minHeight: '100vh',
@@ -301,10 +384,10 @@ const MCRForm: React.FC = () => {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 0 }}>
-            Manual Check Request Form
+            {editingFormData ? 'Edit MCR Form' : 'Manual Check Request Form'}
           </Typography>
           <Typography variant="h6" sx={{ fontWeight: 300, opacity: 0.9 }}>
-            Housing Choice Voucher (MCR) System
+            {editingFormData ? 'Update your rejected form' : 'Housing Choice Voucher (MCR) System'}
           </Typography>
         </Paper>
 
@@ -339,14 +422,16 @@ const MCRForm: React.FC = () => {
               boxSizing: 'border-box'
             }}>
               <TextField
-                select
                 label="Housing Specialist Name"
                 required
                 value={housingSpecialistName}
-                onChange={(e) => setHousingSpecialistName(e.target.value)}
+                InputProps={{
+                  readOnly: true,
+                }}
                 fullWidth
                 sx={{
                   '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f8f9fa',
                     '&:hover fieldset': {
                       borderColor: '#667eea',
                     },
@@ -355,22 +440,19 @@ const MCRForm: React.FC = () => {
                     },
                   },
                 }}
-              >
-                {housingSpecialists.map((name) => (
-                  <MenuItem key={name} value={name}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              />
               <TextField 
                 label="Housing Specialist Email" 
                 required 
                 type="email" 
                 value={housingSpecialistEmail}
-                onChange={(e) => setHousingSpecialistEmail(e.target.value)}
+                InputProps={{
+                  readOnly: true,
+                }}
                 fullWidth
                 sx={{
                   '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f8f9fa',
                     '&:hover fieldset': {
                       borderColor: '#667eea',
                     },
@@ -381,9 +463,10 @@ const MCRForm: React.FC = () => {
                 }}
               />
               <DatePicker
-                label="Date"
+                label="Date of Request"
                 value={date}
                 onChange={setDate}
+                minDate={new Date()}
                 slotProps={{ 
                   textField: { 
                     required: true, 
@@ -425,58 +508,7 @@ const MCRForm: React.FC = () => {
                   </MenuItem>
                 ))}
               </TextField>
-              <TextField 
-                label="Last 4 of SSN" 
-                required 
-                inputProps={{ maxLength: 4 }} 
-                value={lastFourSSN}
-                onChange={(e) => setLastFourSSN(e.target.value)}
-                fullWidth
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': {
-                      borderColor: '#667eea',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#667eea',
-                    },
-                  },
-                }}
-              />
-              <TextField 
-                label="Tenant Name" 
-                required 
-                value={tenantName}
-                onChange={(e) => setTenantName(e.target.value)}
-                fullWidth
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': {
-                      borderColor: '#667eea',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#667eea',
-                    },
-                  },
-                }}
-              />
-              <TextField 
-                label="Owner Account Number" 
-                required 
-                value={ownerAccountNumber}
-                onChange={(e) => setOwnerAccountNumber(e.target.value)}
-                fullWidth
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': {
-                      borderColor: '#667eea',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#667eea',
-                    },
-                  },
-                }}
-              />
+
             </Box>
           </Box>
 
@@ -583,6 +615,60 @@ const MCRForm: React.FC = () => {
             </Box>
           </Box>
 
+          {/* Tenant Information Section */}
+          <Box sx={{ mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Person sx={{ fontSize: 24, color: '#667eea', mr: 1.5 }} />
+              <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
+                Tenant Information
+              </Typography>
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+              gap: 3,
+              width: '100%',
+              boxSizing: 'border-box'
+            }}>
+              <TextField 
+                label="Tenant Name" 
+                required 
+                value={tenantName}
+                onChange={(e) => setTenantName(e.target.value)}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#667eea',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#667eea',
+                    },
+                  },
+                }}
+              />
+              <TextField 
+                label="Last 4 of Tenant SSN" 
+                required 
+                inputProps={{ maxLength: 4 }} 
+                value={lastFourSSN}
+                onChange={(e) => setLastFourSSN(e.target.value)}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#667eea',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#667eea',
+                    },
+                  },
+                }}
+              />
+            </Box>
+          </Box>
+
           {/* Landlord Information Section */}
           <Box sx={{ mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -601,7 +687,6 @@ const MCRForm: React.FC = () => {
             }}>
               <TextField 
                 label="Landlord First Name" 
-                required 
                 value={landlordFirstName}
                 onChange={(e) => setLandlordFirstName(e.target.value)}
                 fullWidth
@@ -618,7 +703,6 @@ const MCRForm: React.FC = () => {
               />
               <TextField 
                 label="Landlord Last Name" 
-                required 
                 value={landlordLastName}
                 onChange={(e) => setLandlordLastName(e.target.value)}
                 fullWidth
@@ -633,27 +717,40 @@ const MCRForm: React.FC = () => {
                   },
                 }}
               />
-              <DatePicker
-                label="Effective Date"
-                value={effectiveDate}
-                onChange={setEffectiveDate}
-                slotProps={{ 
-                  textField: { 
-                    required: true, 
-                    fullWidth: true,
-                    sx: {
-                      '& .MuiOutlinedInput-root': {
-                        '&:hover fieldset': {
-                          borderColor: '#667eea',
-                        },
-                        '&.Mui-focused fieldset': {
-                          borderColor: '#667eea',
-                        },
-                      },
-                    }
-                  } 
+              <TextField 
+                label="Entity Name" 
+                value={entityName}
+                onChange={(e) => setEntityName(e.target.value)}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#667eea',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#667eea',
+                    },
+                  },
                 }}
               />
+              <TextField 
+                label="Owner Account Number" 
+                required 
+                value={ownerAccountNumber}
+                onChange={(e) => setOwnerAccountNumber(e.target.value)}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: '#667eea',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#667eea',
+                    },
+                  },
+                }}
+              />
+
             </Box>
           </Box>
 
@@ -698,6 +795,27 @@ const MCRForm: React.FC = () => {
                 onChange={setVacateDate}
                 slotProps={{ 
                   textField: { 
+                    fullWidth: true,
+                    sx: {
+                      '& .MuiOutlinedInput-root': {
+                        '&:hover fieldset': {
+                          borderColor: '#667eea',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#667eea',
+                        },
+                      },
+                    }
+                  } 
+                }}
+              />
+              <DatePicker
+                label="Effective Date"
+                value={effectiveDate}
+                onChange={setEffectiveDate}
+                slotProps={{ 
+                  textField: { 
+                    required: true, 
                     fullWidth: true,
                     sx: {
                       '& .MuiOutlinedInput-root': {
@@ -958,64 +1076,38 @@ const MCRForm: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Signature Section */}
-          <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Description sx={{ fontSize: 24, color: '#667eea', mr: 1.5 }} />
-              <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
-                Digital Signature
-              </Typography>
-            </Box>
-            <Divider sx={{ mb: 2 }} />
-            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-              <Typography variant="subtitle1" sx={{ mb: 1.5, color: '#667eea', fontWeight: 600 }}>
-                Housing Specialist Signature
-              </Typography>
-              <Box sx={{ 
-                border: '2px dashed #667eea', 
-                borderRadius: 2,
-                p: 1.5,
-                mb: 1.5,
-                bgcolor: '#f8f9fa',
-                minHeight: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <SignatureCanvas
-                  ref={signatureRef}
-                  canvasProps={{
-                    width: 500,
-                    height: 200,
-                    className: 'signature-canvas',
-                    style: {
-                      border: 'none',
-                      borderRadius: '8px',
-                      backgroundColor: 'transparent'
-                    }
-                  }}
-                />
-              </Box>
-              <Button 
-                variant="outlined" 
-                size="medium" 
-                onClick={clearSignature}
-                sx={{ 
-                  borderColor: '#667eea',
-                  color: '#667eea',
-                  '&:hover': {
-                    borderColor: '#5a6fd8',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                  }
-                }}
-              >
-                Clear Signature
-              </Button>
-            </Paper>
-          </Box>
 
-          {/* Submit Button */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+          {/* Submit and Clear Buttons */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
+            <Button 
+              type="button"
+              variant="outlined" 
+              onClick={resetForm}
+              disabled={isSubmitting}
+              sx={{
+                borderColor: '#667eea',
+                color: '#667eea',
+                px: 4,
+                py: 1.2,
+                fontSize: '1rem',
+                borderRadius: 2.5,
+                '&:hover': {
+                  borderColor: '#5a6fd8',
+                  backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 8px 25px rgba(102, 126, 234, 0.2)',
+                },
+                '&:disabled': {
+                  borderColor: '#ccc',
+                  color: '#ccc',
+                  transform: 'none',
+                  boxShadow: 'none',
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Clear Form
+            </Button>
             <Button 
               type="submit"
               variant="contained" 
@@ -1040,7 +1132,7 @@ const MCRForm: React.FC = () => {
                 transition: 'all 0.3s ease'
               }}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit MCR Form'}
+              {isSubmitting ? (editingFormData ? 'Updating...' : 'Submitting...') : (editingFormData ? 'Update MCR Form' : 'Submit MCR Form')}
             </Button>
           </Box>
         </Paper>

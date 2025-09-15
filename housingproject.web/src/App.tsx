@@ -4,12 +4,14 @@ import MCRForm from './components/MCRForm';
 import Login from './components/Login';
 import LandingPage from './components/LandingPage';
 import FormsList from './components/FormsList';
+import Dashboard from './components/Dashboard';
 
 function App() {
   const [selectedForm, setSelectedForm] = useState('landing');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [editingFormData, setEditingFormData] = useState(null);
 
   const handleLogin = async (username: string, password: string) => {
     setIsLoading(true);
@@ -23,16 +25,15 @@ function App() {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('username', username);
         localStorage.setItem('authType', 'windows');
+      } else if (password === 'domain-auth') {
+        // Domain authentication was successful
+        setIsAuthenticated(true);
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('username', username);
+        localStorage.setItem('authType', 'domain');
       } else {
-        // Fallback to manual authentication (for development/testing)
-        if (username === 'admin' && password === 'password123') {
-          setIsAuthenticated(true);
-          localStorage.setItem('isAuthenticated', 'true');
-          localStorage.setItem('username', username);
-          localStorage.setItem('authType', 'manual');
-        } else {
-          setLoginError('Invalid username or password. Please try again.');
-        }
+        // This should not happen with the new login flow
+        setLoginError('Authentication failed. Please try again.');
       }
     } catch (error) {
       setLoginError('An error occurred during login. Please try again.');
@@ -64,6 +65,16 @@ function App() {
     setSelectedForm('landing');
   };
 
+  const handleNavigateToEditForm = (formData: any) => {
+    setEditingFormData(formData);
+    setSelectedForm('mcr');
+  };
+
+  const handleNavigateToFormDetails = (formId: number) => {
+    // For now, just navigate to forms list where details can be viewed
+    setSelectedForm('forms-list');
+  };
+
   // Check if user is already authenticated on app load
   useEffect(() => {
     const checkAuthentication = async () => {
@@ -74,7 +85,7 @@ function App() {
         if (authType === 'windows') {
           // For Windows Auth, verify the session is still valid
           try {
-            const response = await fetch('/api/auth/user', {
+            const response = await fetch('http://192.168.10.52:8080/api/auth/user', {
               credentials: 'include',
             });
             
@@ -120,6 +131,7 @@ function App() {
         onNavigateToDashboard={handleNavigateToDashboard}
         onNavigateToFormsList={handleNavigateToFormsList}
         onLogout={handleLogout}
+        username={localStorage.getItem('username') || undefined}
       />
     );
   }
@@ -131,15 +143,34 @@ function App() {
     );
   }
 
+  // If dashboard is selected, show it without the layout
+  if (selectedForm === 'dashboard') {
+    return (
+      <Dashboard 
+        onNavigateToForm={handleNavigateToForm}
+        onNavigateToFormsList={handleNavigateToFormsList}
+        onNavigateToEditForm={handleNavigateToEditForm}
+        onNavigateToFormDetails={handleNavigateToFormDetails}
+        onNavigateBack={handleNavigateBack}
+        onLogout={handleLogout}
+        username={localStorage.getItem('username') || undefined}
+      />
+    );
+  }
+
   return (
-    <Layout onFormSelect={setSelectedForm} onLogout={handleLogout}>
-      {selectedForm === 'mcr' && <MCRForm />}
-      {selectedForm === 'dashboard' && (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-          <h2>Dashboard</h2>
-          <p>Dashboard functionality coming soon...</p>
-          <button onClick={() => setSelectedForm('landing')}>Back to Landing Page</button>
-        </div>
+    <Layout 
+      onFormSelect={setSelectedForm} 
+      onLogout={handleLogout}
+    >
+      {selectedForm === 'mcr' && (
+        <MCRForm 
+          editingFormData={editingFormData} 
+          onFormSubmitted={() => setEditingFormData(null)}
+          onNavigateToDashboard={handleNavigateToDashboard}
+          onNavigateToFormsList={handleNavigateToFormsList}
+          onLogout={handleLogout}
+        />
       )}
       {/* Add more forms here as needed */}
     </Layout>

@@ -14,12 +14,14 @@ interface SidebarMenuProps {
   onNavigateToForm: () => void;
   onNavigateToDashboard: () => void;
   onLogout?: () => void;
+  username?: string;
 }
 
 const SidebarMenu: React.FC<SidebarMenuProps> = ({ 
   onNavigateToForm, 
   onNavigateToDashboard,
-  onLogout
+  onLogout,
+  username
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,7 +34,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({
       title: 'SharePoint',
       description: 'Access Housing & Departments Sharepoint',
       icon: <Description sx={{ fontSize: 30, color: 'inherit' }} />,
-      action: onNavigateToForm
+      action: () => window.open('https://cityofvallejo.sharepoint.com/sites/hcdd', '_blank')
     },
     {
       id: 'Housing Pro',
@@ -120,6 +122,58 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({
           zIndex: 1000,
         }}
       >
+        {/* User Profile Section */}
+        {username && (
+          <Paper
+            className={`sidebar-card ${isOpen ? 'slide-in' : 'slide-out'}`}
+            sx={{
+              position: 'relative',
+              padding: '1em',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: '#fff',
+              borderRadius: '0.5em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              cursor: 'default',
+              transition: 'all 0.3s ease',
+              transform: 'translateX(110%)',
+              '&.slide-in': {
+                transform: 'translateX(0%)',
+                transitionDelay: '0s',
+              },
+              '&.slide-out': {
+                transform: 'translateX(110%)',
+                transitionDelay: '0s',
+              }
+            }}
+          >
+            <Box
+              sx={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.2rem',
+                fontWeight: 600,
+                fontFamily: 'Roboto, sans-serif',
+              }}
+            >
+              {username.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '1rem' }}>
+                Welcome back
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.9rem' }}>
+                {username}
+              </Typography>
+            </Box>
+          </Paper>
+        )}
         {menuCards.map((card, index) => (
           <Paper
             key={card.id}

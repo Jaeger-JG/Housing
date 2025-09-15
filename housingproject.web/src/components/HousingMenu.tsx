@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import "./HousingMenu.css";
 
 const menuLinks = [
   { path: "/", label: "Home" },
+  { path: "/dashboard", label: "Dashboard" },
   { path: "/mcr-form", label: "Forms" },
   { path: "/about", label: "Reports" },
   { path: "/contact", label: "Housing Portal" },
@@ -13,22 +14,25 @@ interface HousingMenuProps {
   isOpen?: boolean;
   onToggle?: () => void;
   showMenuBar?: boolean;
+  username?: string;
+  onNavigateToForms?: () => void;
+  onNavigateToDashboard?: () => void;
 }
 
 const HousingMenu: React.FC<HousingMenuProps> = ({ 
   onLogout, 
   isOpen: externalIsOpen, 
   onToggle: externalOnToggle,
-  showMenuBar = true 
+  showMenuBar = true,
+  username,
+  onNavigateToForms,
+  onNavigateToDashboard
 }) => {
   const container = useRef<HTMLDivElement>(null);
   const [internalIsOpen, setInternalIsOpen] = useState(false);
 
   // Use external state if provided, otherwise use internal state
   const isMenuOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const setIsMenuOpen = externalOnToggle ? 
-    () => externalOnToggle() : 
-    (value: boolean) => setInternalIsOpen(value);
 
   const toggleMenu = () => {
     if (externalOnToggle) {
@@ -47,6 +51,12 @@ const HousingMenu: React.FC<HousingMenuProps> = ({
     }
   };
 
+  // Get initials from username
+  const getInitials = (name: string) => {
+    if (!name) return '?';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
   return (
     <div className="housing-menu-container" ref={container}>
       {/* menu-bar - only show if showMenuBar is true */}
@@ -55,8 +65,19 @@ const HousingMenu: React.FC<HousingMenuProps> = ({
           <div className="housing-menu-logo">
             <span>Housing Project</span>
           </div>
-          <div className="housing-menu-open" onClick={toggleMenu}>
-            <p>Menu</p>
+          <div className="housing-menu-controls">
+            {/* Profile Bubble */}
+            {username && (
+              <div className="housing-menu-profile">
+                <div className="housing-menu-profile-bubble">
+                  {getInitials(username)}
+                </div>
+                <span className="housing-menu-username">{username}</span>
+              </div>
+            )}
+            <div className="housing-menu-open" onClick={toggleMenu}>
+              <p>Menu</p>
+            </div>
           </div>
         </div>
       )}
@@ -81,8 +102,26 @@ const HousingMenu: React.FC<HousingMenuProps> = ({
           <div className="housing-menu-links">
             {menuLinks.map((link, index) => (
               <div key={index} className="housing-menu-link-item">
-                <div className="housing-menu-link-item-holder" onClick={toggleMenu}>
-                  <a className="housing-menu-link" href={link.path}>
+                <div className="housing-menu-link-item-holder" onClick={() => {
+                  toggleMenu();
+                  if (link.label === 'Forms' && onNavigateToForms) {
+                    onNavigateToForms();
+                  } else if (link.label === 'Dashboard' && onNavigateToDashboard) {
+                    onNavigateToDashboard();
+                  }
+                }}>
+                  <a 
+                    className="housing-menu-link" 
+                    href={link.path}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (link.label === 'Forms' && onNavigateToForms) {
+                        onNavigateToForms();
+                      } else if (link.label === 'Dashboard' && onNavigateToDashboard) {
+                        onNavigateToDashboard();
+                      }
+                    }}
+                  >
                     {link.label}
                   </a>
                 </div>
@@ -90,7 +129,7 @@ const HousingMenu: React.FC<HousingMenuProps> = ({
             ))}
             <div className="housing-menu-link-item">
               <div className="housing-menu-link-item-holder" onClick={handleLogout}>
-                <a className="housing-menu-link" href="#">
+                <a className="housing-menu-link" href="/logout" onClick={(e) => e.preventDefault()}>
                   Logout
                 </a>
               </div>

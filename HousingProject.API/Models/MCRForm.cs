@@ -59,11 +59,11 @@ public class MCRForm
     public string ZipCode { get; set; } = string.Empty;
     
     // Landlord Information
-    [Required]
-    public string LandlordFirstName { get; set; } = string.Empty;
+    public string? LandlordFirstName { get; set; }
     
-    [Required]
-    public string LandlordLastName { get; set; } = string.Empty;
+    public string? LandlordLastName { get; set; }
+    
+    public string? EntityName { get; set; }
     
     [Required]
     public DateTime EffectiveDate { get; set; }

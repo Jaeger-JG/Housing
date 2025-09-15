@@ -44,7 +44,6 @@ C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\M
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\Microsoft.OpenApi.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\Microsoft.SqlServer.Server.dll
-C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\Microsoft.Win32.SystemEvents.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\Mono.TextTemplating.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.ClientModel.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.CodeDom.dll
@@ -54,13 +53,10 @@ C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\S
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.Composition.Runtime.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.Composition.TypedParts.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.Configuration.ConfigurationManager.dll
-C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.Drawing.Common.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.Memory.Data.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.Runtime.Caching.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.Security.Cryptography.ProtectedData.dll
-C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.Security.Permissions.dll
-C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.Windows.Extensions.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\cs\Microsoft.CodeAnalysis.resources.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\de\Microsoft.CodeAnalysis.resources.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\es\Microsoft.CodeAnalysis.resources.dll
@@ -132,12 +128,7 @@ C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\r
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
-C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
-C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
-C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
-C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\obj\Release\net9.0\HousingProject.API.csproj.AssemblyReference.cache
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\obj\Release\net9.0\rpswa.dswa.cache.json
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\obj\Release\net9.0\HousingProject.API.GeneratedMSBuildEditorConfig.editorconfig
@@ -162,3 +153,11 @@ C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\obj\Release\net9.0\H
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\obj\Release\net9.0\HousingProject.API.genruntimeconfig.cache
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\obj\Release\net9.0\ref\HousingProject.API.dll
 C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\appsetting.Production.json
+C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.DirectoryServices.dll
+C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.DirectoryServices.AccountManagement.dll
+C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\System.DirectoryServices.Protocols.dll
+C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win\lib\net8.0\System.DirectoryServices.dll
+C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win\lib\net8.0\System.DirectoryServices.AccountManagement.dll
+C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\linux\lib\net8.0\System.DirectoryServices.Protocols.dll
+C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\osx\lib\net8.0\System.DirectoryServices.Protocols.dll
+C:\Users\admin.grier\Desktop\MCR\Housing\HousingProject.API\bin\Release\net9.0\runtimes\win\lib\net8.0\System.DirectoryServices.Protocols.dll

@@ -43,17 +43,17 @@ public class EmailService : IEmailService
                 throw new InvalidOperationException("SMTP configuration is incomplete");
             }
 
+            // Set SSL certificate validation callback to bypass validation for internal SMTP servers
+            if (smtpPort == 587 || smtpPort == 465)
+            {
+                ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            }
+
             using var client = new SmtpClient(smtpServer, smtpPort)
             {
                 EnableSsl = smtpPort == 587 || smtpPort == 465, // Only enable SSL for standard secure ports
                 Credentials = new NetworkCredential(smtpUsername, smtpPassword)
             };
-
-            // Bypass SSL certificate validation for internal SMTP server
-            if (smtpPort == 587 || smtpPort == 465)
-            {
-                ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
-            }
 
             var message = new MailMessage
             {

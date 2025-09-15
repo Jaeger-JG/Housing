@@ -88,6 +88,9 @@ namespace HousingProject.API.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("EntityName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("FormId")
                         .HasColumnType("int");
 
@@ -103,11 +106,9 @@ namespace HousingProject.API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LandlordFirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LandlordLastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastFourSSN")

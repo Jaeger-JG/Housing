@@ -14,17 +14,21 @@ import {
   IconButton,
   TextField,
   InputAdornment,
-  Container,
   Alert,
-  Snackbar
+  Snackbar,
+  MenuItem,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText
 } from '@mui/material';
 import { 
   ArrowBack, 
   Search, 
   Description, 
   CalendarToday,
-  Person,
-  FilterList,
   Visibility
 } from '@mui/icons-material';
 import FormDetails from './FormDetails';
@@ -54,6 +58,7 @@ interface MCRFormData {
   ownerAccountNumber?: string;
   landlordFirstName?: string;
   landlordLastName?: string;
+  entityName?: string;
   reasonComments?: string;
   thirdPartyPaymentsVerified?: boolean;
   transactionScreenVerified?: boolean;
@@ -62,6 +67,7 @@ interface MCRFormData {
   description?: string;
   dateIntendedToVacate?: string;
   signatureData?: string;
+  isUpdating?: boolean; // Added for loading state
 }
 
 interface FormsListProps {
@@ -71,10 +77,48 @@ interface FormsListProps {
 const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
   const [forms, setForms] = useState<MCRFormData[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('Pending');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedForm, setSelectedForm] = useState<MCRFormData | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [formToReject, setFormToReject] = useState<MCRFormData | null>(null);
+
+  // Authorized users who can approve/reject forms
+  const authorizedUsers = [
+    'justin.grier',
+    'alicia.jones', 
+    'chari.francisco',
+    'shenessa.williams'
+  ];
+
+  // Check if current user is authorized to approve/reject forms
+  const isUserAuthorized = () => {
+    const currentUser = localStorage.getItem('username');
+    return currentUser && authorizedUsers.includes(currentUser.toLowerCase());
+  };
+
+  // Handle rejection dialog
+  const handleRejectClick = (form: MCRFormData) => {
+    setFormToReject(form);
+    setRejectionReason('');
+    setRejectionDialogOpen(true);
+  };
+
+  const handleRejectionDialogClose = () => {
+    setRejectionDialogOpen(false);
+    setFormToReject(null);
+    setRejectionReason('');
+  };
+
+  const handleRejectionSubmit = async () => {
+    if (formToReject && rejectionReason.trim()) {
+      await updateFormStatus(formToReject.id, 'Rejected');
+      handleRejectionDialogClose();
+    }
+  };
 
   // Fetch forms from API
   useEffect(() => {
@@ -83,7 +127,7 @@ const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/MCR', {
+        const response = await fetch('https://housing-forms.cityofvallejo.net/api/MCR', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -127,6 +171,7 @@ const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
           ownerAccountNumber: form.ownerAccountNumber,
           landlordFirstName: form.landlordFirstName,
           landlordLastName: form.landlordLastName,
+          entityName: form.entityName,
           reasonComments: form.reasonComments,
           thirdPartyPaymentsVerified: form.thirdPartyPaymentsVerified,
           transactionScreenVerified: form.transactionScreenVerified,
@@ -174,7 +219,13 @@ const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
     const statusStr = typeof form.status === 'number' ? 
       ['Pending', 'Approved', 'Rejected', 'InReview'][form.status] || 'Pending' :
       String(form.status);
-      
+    
+    // Status filter
+    if (statusFilter !== 'All' && statusStr !== statusFilter) {
+      return false;
+    }
+    
+    // Search term filter
     return form.tenantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `${form.addressLine1} ${form.city} ${form.state}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
       statusStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -221,7 +272,16 @@ const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
     try {
       console.log(`Updating form ${formId} status to ${newStatus}`);
       
-      const response = await fetch(`/api/MCR/${formId}/status`, {
+      // Show loading state immediately
+      setForms(prevForms => 
+        prevForms.map(form => 
+          form.id === formId 
+            ? { ...form, isUpdating: true }
+            : form
+        )
+      );
+
+      const response = await fetch(`https://housing-forms.cityofvallejo.net/api/MCR/${formId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -234,16 +294,47 @@ const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
 
       if (response.ok) {
         console.log('Status updated successfully');
-        // Refresh the forms list
-        window.location.reload();
+        
+        // Update the local state immediately for instant UI feedback
+        setForms(prevForms => 
+          prevForms.map(form => 
+            form.id === formId 
+              ? { ...form, status: newStatus, isUpdating: false }
+              : form
+          )
+        );
+
+        // Show success message
+        setError(null); // Clear any existing errors
+        
       } else {
         const errorText = await response.text();
         console.error('Failed to update status:', response.status, errorText);
-        alert(`Failed to update status: ${response.status} - ${errorText}`);
+        
+        // Revert the loading state and show error
+        setForms(prevForms => 
+          prevForms.map(form => 
+            form.id === formId 
+              ? { ...form, isUpdating: false }
+              : form
+          )
+        );
+        
+        setError(`Failed to update status: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('Error updating status:', error);
-      alert(`Error updating status: ${error}`);
+      
+      // Revert the loading state and show error
+      setForms(prevForms => 
+        prevForms.map(form => 
+          form.id === formId 
+            ? { ...form, isUpdating: false }
+            : form
+        )
+      );
+      
+      setError(`Error updating status: ${error}`);
     }
   };
 
@@ -299,20 +390,48 @@ const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
                 ),
               }}
             />
-            <Button
-              variant="outlined"
-              startIcon={<FilterList />}
+            <TextField
+              select
+              label="Filter by Status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
               sx={{
-                borderColor: '#667eea',
-                color: '#667eea',
-                '&:hover': {
-                  borderColor: '#5a6fd8',
-                  backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                }
+                minWidth: 200,
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': {
+                    borderColor: '#667eea',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#667eea',
+                  },
+                },
               }}
             >
-              Filters
-            </Button>
+              <MenuItem value="All">All Statuses</MenuItem>
+              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="Approved">Approved</MenuItem>
+              <MenuItem value="Rejected">Rejected</MenuItem>
+              <MenuItem value="InReview">In Review</MenuItem>
+            </TextField>
+            {(searchTerm || statusFilter !== 'All') && (
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setSearchTerm('');
+                  setStatusFilter('All');
+                }}
+                sx={{
+                  borderColor: '#667eea',
+                  color: '#667eea',
+                  '&:hover': {
+                    borderColor: '#5a6fd8',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                  }
+                }}
+              >
+                Clear Filters
+              </Button>
+            )}
           </Box>
         </Paper>
 
@@ -427,26 +546,38 @@ const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
                             View Details
                           </Button>
                           {form.status === 'Pending' && (
-                            <Box sx={{ display: 'flex', gap: 0.5 }}>
-                              <Button
-                                variant="contained"
-                                size="small"
-                                color="success"
-                                onClick={() => updateFormStatus(form.id, 'Approved')}
-                                sx={{ fontSize: '0.7rem', px: 1 }}
-                              >
-                                Approve
-                              </Button>
-                              <Button
-                                variant="contained"
-                                size="small"
-                                color="error"
-                                onClick={() => updateFormStatus(form.id, 'Rejected')}
-                                sx={{ fontSize: '0.7rem', px: 1 }}
-                              >
-                                Reject
-                              </Button>
-                            </Box>
+                            <>
+                              {isUserAuthorized() ? (
+                                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                  <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="success"
+                                    onClick={() => updateFormStatus(form.id, 'Approved')}
+                                    disabled={form.isUpdating}
+                                    sx={{ fontSize: '0.7rem', px: 1 }}
+                                    startIcon={form.isUpdating ? <CircularProgress size={16} color="inherit" /> : undefined}
+                                  >
+                                    {form.isUpdating ? 'Updating...' : 'Approve'}
+                                  </Button>
+                                  <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="error"
+                                    onClick={() => handleRejectClick(form)}
+                                    disabled={form.isUpdating}
+                                    sx={{ fontSize: '0.7rem', px: 1 }}
+                                    startIcon={form.isUpdating ? <CircularProgress size={16} color="inherit" /> : undefined}
+                                  >
+                                    {form.isUpdating ? 'Updating...' : 'Reject'}
+                                  </Button>
+                                </Box>
+                              ) : (
+                                <Typography variant="caption" color="textSecondary" sx={{ fontStyle: 'italic' }}>
+                                  View only
+                                </Typography>
+                              )}
+                            </>
                           )}
                         </Box>
                       </TableCell>
@@ -463,10 +594,10 @@ const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
           <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
             <Box>
               <Typography variant="h6" color="primary" fontWeight={600}>
-                {forms.length}
+                {filteredForms.length}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                Total Forms
+                {searchTerm || statusFilter !== 'All' ? 'Filtered Forms' : 'Total Forms'}
               </Typography>
             </Box>
             <Box>
@@ -521,11 +652,64 @@ const FormsList: React.FC<FormsListProps> = ({ onNavigateBack }) => {
           updateFormStatus(formId, 'Approved');
           handleCloseDetails();
         }}
-        onReject={(formId) => {
+        onReject={(formId, reason) => {
           updateFormStatus(formId, 'Rejected');
           handleCloseDetails();
+          // Note: The rejection reason is captured but not currently stored in the database
+          // This could be enhanced to store the reason in a future update
+          if (reason) {
+            console.log(`Form ${formId} rejected with reason: ${reason}`);
+          }
         }}
       />
+
+      {/* Rejection Dialog */}
+      <Dialog
+        open={rejectionDialogOpen}
+        onClose={handleRejectionDialogClose}
+        aria-labelledby="rejection-dialog-title"
+        aria-describedby="rejection-dialog-description"
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle id="rejection-dialog-title">
+          Reject MCR Form
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="rejection-dialog-description" sx={{ mb: 2 }}>
+            Please provide a reason for rejecting this form. This information will be recorded and may be shared with the housing specialist.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Reason for Rejection"
+            type="text"
+            fullWidth
+            variant="outlined"
+            multiline
+            rows={4}
+            value={rejectionReason}
+            onChange={(e) => setRejectionReason(e.target.value)}
+            placeholder="Enter the reason for rejection..."
+            required
+            error={!rejectionReason.trim()}
+            helperText={!rejectionReason.trim() ? "Rejection reason is required" : ""}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={handleRejectionDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleRejectionSubmit} 
+            color="error" 
+            variant="contained"
+            disabled={!rejectionReason.trim()}
+          >
+            Reject Form
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Error Snackbar */}
       <Snackbar 

@@ -11,14 +11,7 @@ import {
   Chip
 } from '@mui/material';
 import { 
-  Assignment,
-  Description,
-  Home,
-  Business,
-  Calculate,
-  Person,
-  Settings,
-  Assessment
+  Assignment
 } from '@mui/icons-material';
 
 interface FormOption {
@@ -156,6 +149,7 @@ const FormSidebar: React.FC<FormSidebarProps> = ({ selectedForm, onFormSelect })
           </Box>
         ))}
       </Box>
+
 
       <Box sx={{ p: 2, mt: 'auto' }}>
         <Typography variant="caption" color="textSecondary" sx={{ textAlign: 'center', display: 'block' }}>

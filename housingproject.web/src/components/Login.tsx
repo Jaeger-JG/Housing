@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -34,6 +34,33 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading = false, error }) => {
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
+  // Removed automatic Windows Authentication - now shows login form immediately
+
+  const handleWindowsAuth = async () => {
+    try {
+      // Check if user is authenticated via Windows Auth
+      const response = await fetch('https://housing-forms.cityofvallejo.net/api/auth/user', {
+        method: 'GET',
+        credentials: 'include', // Important for Windows Auth
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        // Call the onLogin with Windows Auth data
+        onLogin(userData.username, 'windows-auth');
+      } else {
+        // Handle unauthorized - show error or fallback to manual login
+        console.log('Windows Auth not available, falling back to manual login');
+      }
+    } catch (error) {
+      console.error('Windows Auth error:', error);
+      // Fallback to manual login on error
+    }
+  };
+
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
     setUsernameError('');
@@ -63,10 +90,35 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading = false, error }) => {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onLogin(username, password);
+      try {
+        // Call the new domain authentication endpoint
+        const response = await fetch('https://housing-forms.cityofvallejo.net/api/auth/login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password
+          }),
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          onLogin(userData.username, 'domain-auth');
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Login failed');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        // You might want to show this error to the user
+        throw error;
+      }
     }
   };
 
@@ -74,30 +126,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading = false, error }) => {
     setShowPassword(!showPassword);
   };
 
-  const handleWindowsAuth = async () => {
-    try {
-      // Check if user is authenticated via Windows Auth
-      const response = await fetch('http://localhost:5042/api/auth/user', {
-        method: 'GET',
-        credentials: 'include', // Important for Windows Auth
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
 
-      if (response.ok) {
-        const userData = await response.json();
-        // Call the onLogin with Windows Auth data
-        onLogin(userData.username, 'windows-auth');
-      } else {
-        // Handle unauthorized - show error or fallback to manual login
-        console.log('Windows Auth not available, falling back to manual login');
-      }
-    } catch (error) {
-      console.error('Windows Auth error:', error);
-      // Fallback to manual login on error
-    }
-  };
 
   return (
     <Box

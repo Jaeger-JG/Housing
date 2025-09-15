@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, CssBaseline, Box, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Typography, CssBaseline, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HousingMenu from './HousingMenu';
 
 interface NavbarProps {
   onLogout?: () => void;
+  onNavigateToDashboard?: () => void;
+  onNavigateToFormsList?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({ onLogout, onNavigateToDashboard, onNavigateToFormsList }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -63,7 +65,14 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       </AppBar>
       
       {/* Housing Menu Overlay */}
-      <HousingMenu onLogout={handleLogout} isOpen={isMenuOpen} onToggle={toggleMenu} showMenuBar={false} />
+      <HousingMenu 
+        onLogout={handleLogout} 
+        isOpen={isMenuOpen} 
+        onToggle={toggleMenu} 
+        showMenuBar={false}
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToForms={onNavigateToFormsList}
+      />
     </>
   );
 };

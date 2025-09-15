@@ -19,6 +19,53 @@
   box-sizing: border-box;
 }
 
+/* Profile and Menu Controls */
+.housing-menu-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.housing-menu-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.housing-menu-profile-bubble {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: 'Roboto', sans-serif;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.housing-menu-profile-bubble:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.housing-menu-username {
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .housing-menu-bar a,
 .housing-menu-open p {
   color: #fff;

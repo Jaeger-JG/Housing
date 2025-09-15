@@ -4,7 +4,8 @@ import {
   Description, 
   Dashboard,
   Business,
-  Security
+  Security,
+  Assignment
 } from '@mui/icons-material';
 import HousingMenu from './HousingMenu';
 import SidebarMenu from './SidebarMenu';
@@ -14,19 +15,27 @@ interface LandingPageProps {
   onNavigateToDashboard: () => void;
   onNavigateToFormsList: () => void;
   onLogout?: () => void;
+  username?: string;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ 
   onNavigateToForm, 
   onNavigateToDashboard,
   onNavigateToFormsList,
-  onLogout
+  onLogout,
+  username
 }) => {
   const features = [
     {
-      icon: <Description sx={{ fontSize: 40, color: '#667eea' }} />,
+      icon: <Assignment sx={{ fontSize: 40, color: '#667eea' }} />,
       title: 'Forms',
-      description: 'Create and manage Manual Check Request forms with digital signatures',
+      description: 'Create and manage MCR forms and documentation',
+      onClick: onNavigateToForm
+    },
+    {
+      icon: <Description sx={{ fontSize: 40, color: '#667eea' }} />,
+      title: 'Task List',
+      description: 'Approve and manage Forms with digital signatures',
       onClick: onNavigateToFormsList
 
     },
@@ -51,13 +60,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
   return (
     <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' }}>
       {/* Housing Menu */}
-      <HousingMenu onLogout={onLogout} />
+      <HousingMenu onLogout={onLogout} username={username} onNavigateToForms={onNavigateToFormsList} onNavigateToDashboard={onNavigateToDashboard} />
       
       {/* Sidebar Menu */}
       <SidebarMenu 
         onNavigateToForm={onNavigateToForm}
         onNavigateToDashboard={onNavigateToDashboard}
         onLogout={onLogout}
+        username={username}
       />
       
       {/* Hero Section */}
@@ -140,7 +150,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         
         <Box sx={{ 
           display: 'grid', 
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(5, 1fr)' },
           gap: 4 
         }}>
           {features.map((feature, index) => (

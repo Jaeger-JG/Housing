@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -10,9 +10,9 @@ import {
   Button,
   Divider,
   Chip,
-  FormControlLabel,
   Radio,
-  RadioGroup
+  TextField,
+  DialogContentText
 } from '@mui/material';
 import { 
   Close,
@@ -21,7 +21,6 @@ import {
   Business,
   Calculate,
   DateRange,
-  Description,
   CheckCircle,
   Cancel,
   Edit
@@ -52,6 +51,7 @@ interface MCRFormData {
   ownerAccountNumber?: string;
   landlordFirstName?: string;
   landlordLastName?: string;
+  entityName?: string;
   reasonComments?: string;
   thirdPartyPaymentsVerified?: boolean;
   transactionScreenVerified?: boolean;
@@ -67,7 +67,7 @@ interface FormDetailsProps {
   open: boolean;
   onClose: () => void;
   onApprove?: (formId: number) => void;
-  onReject?: (formId: number) => void;
+  onReject?: (formId: number, reason?: string) => void;
 }
 
 const FormDetails: React.FC<FormDetailsProps> = ({ 
@@ -77,6 +77,42 @@ const FormDetails: React.FC<FormDetailsProps> = ({
   onApprove, 
   onReject 
 }) => {
+  // State for rejection dialog
+  const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+
+  // Authorized users who can approve/reject forms
+  const authorizedUsers = [
+    'justin.grier',
+    'alicia.jones', 
+    'chari.francisco',
+    'shenessa.williams'
+  ];
+
+  // Check if current user is authorized to approve/reject forms
+  const isUserAuthorized = () => {
+    const currentUser = localStorage.getItem('username');
+    return currentUser && authorizedUsers.includes(currentUser.toLowerCase());
+  };
+
+  // Handle rejection dialog
+  const handleRejectClick = () => {
+    setRejectionReason('');
+    setRejectionDialogOpen(true);
+  };
+
+  const handleRejectionDialogClose = () => {
+    setRejectionDialogOpen(false);
+    setRejectionReason('');
+  };
+
+  const handleRejectionSubmit = () => {
+    if (rejectionReason.trim() && onReject) {
+      onReject(form!.id, rejectionReason);
+      handleRejectionDialogClose();
+    }
+  };
+
   if (!form) return null;
 
   const formatDate = (dateString: string) => {
@@ -114,12 +150,6 @@ const FormDetails: React.FC<FormDetailsProps> = ({
     }
   };
 
-  const getFullAddress = () => {
-    const address = [form.addressLine1];
-    if (form.addressLine2) address.push(form.addressLine2);
-    address.push(`${form.city}, ${form.state} ${form.zipCode}`);
-    return address.join(', ');
-  };
 
   // Read-only field component that looks like a TextField
   const ReadOnlyField = ({ label, value, fullWidth = true }: { label: string; value: string | number; fullWidth?: boolean }) => (
@@ -168,7 +198,6 @@ const FormDetails: React.FC<FormDetailsProps> = ({
         alignItems: 'center'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Description sx={{ fontSize: 28 }} />
           <Typography variant="h5" sx={{ fontWeight: 600 }}>
             Manual Check Request Form - #{form.id}
           </Typography>
@@ -202,8 +231,6 @@ const FormDetails: React.FC<FormDetailsProps> = ({
               <ReadOnlyField label="Housing Specialist Email" value={form.housingSpecialistEmail || ''} />
               <ReadOnlyField label="Date" value={formatDate(form.submissionDate)} />
               <ReadOnlyField label="Program Type" value={form.programType || ''} />
-              <ReadOnlyField label="Last 4 of SSN" value={form.lastFourSSN || ''} />
-              <ReadOnlyField label="Tenant Name" value={form.tenantName} />
               <ReadOnlyField label="Owner Account Number" value={form.ownerAccountNumber || ''} />
             </Box>
           </Box>
@@ -232,6 +259,27 @@ const FormDetails: React.FC<FormDetailsProps> = ({
             </Box>
           </Box>
 
+          {/* Tenant Information Section */}
+          <Box sx={{ mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Person sx={{ fontSize: 24, color: '#667eea', mr: 1.5 }} />
+              <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
+                Tenant Information
+              </Typography>
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+              gap: 3,
+              width: '100%',
+              boxSizing: 'border-box'
+            }}>
+              <ReadOnlyField label="Tenant Name" value={form.tenantName} />
+              <ReadOnlyField label="Last 4 of SSN" value={form.lastFourSSN || ''} />
+            </Box>
+          </Box>
+
           {/* Landlord Information Section */}
           <Box sx={{ mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -250,7 +298,7 @@ const FormDetails: React.FC<FormDetailsProps> = ({
             }}>
               <ReadOnlyField label="Landlord First Name" value={form.landlordFirstName || ''} />
               <ReadOnlyField label="Landlord Last Name" value={form.landlordLastName || ''} />
-              <ReadOnlyField label="Effective Date" value={formatDate(form.effectiveDate)} />
+              <ReadOnlyField label="Entity Name" value={form.entityName || ''} />
             </Box>
           </Box>
 
@@ -272,6 +320,7 @@ const FormDetails: React.FC<FormDetailsProps> = ({
             }}>
               <ReadOnlyField label="HAP Amount" value={formatCurrency(form.hapAmount)} />
               <ReadOnlyField label="Date Intended to Vacate" value={form.dateIntendedToVacate ? formatDate(form.dateIntendedToVacate) : ''} />
+              <ReadOnlyField label="Effective Date" value={formatDate(form.effectiveDate)} />
               <ReadOnlyField label="Prorated Amount" value={form.proratedAmount ? formatCurrency(form.proratedAmount) : ''} />
             </Box>
           </Box>
@@ -430,44 +479,6 @@ const FormDetails: React.FC<FormDetailsProps> = ({
             </Box>
           </Box>
 
-          {/* Signature Section */}
-          {form.signatureData && (
-            <Box sx={{ mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Description sx={{ fontSize: 24, color: '#667eea', mr: 1.5 }} />
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
-                  Digital Signature
-                </Typography>
-              </Box>
-              <Divider sx={{ mb: 2 }} />
-              <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-                <Typography variant="subtitle1" sx={{ mb: 1.5, color: '#667eea', fontWeight: 600 }}>
-                  Housing Specialist Signature
-                </Typography>
-                <Box sx={{ 
-                  border: '2px dashed #667eea', 
-                  borderRadius: 2,
-                  p: 1.5,
-                  mb: 1.5,
-                  bgcolor: '#f8f9fa',
-                  minHeight: 150,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <img 
-                    src={form.signatureData} 
-                    alt="Digital Signature" 
-                    style={{ 
-                      maxWidth: '100%', 
-                      maxHeight: '150px',
-                      objectFit: 'contain'
-                    }} 
-                  />
-                </Box>
-              </Paper>
-            </Box>
-          )}
         </Box>
       </DialogContent>
 
@@ -489,27 +500,83 @@ const FormDetails: React.FC<FormDetailsProps> = ({
         </Button>
         {form.status === 'Pending' && onApprove && onReject && (
           <>
-            <Button 
-              onClick={() => onApprove(form.id)}
-              variant="contained"
-              color="success"
-              startIcon={<CheckCircle />}
-              sx={{ fontWeight: 600 }}
-            >
-              Approve
-            </Button>
-            <Button 
-              onClick={() => onReject(form.id)}
-              variant="contained"
-              color="error"
-              startIcon={<Cancel />}
-              sx={{ fontWeight: 600 }}
-            >
-              Reject
-            </Button>
+            {isUserAuthorized() ? (
+              <>
+                <Button 
+                  onClick={() => onApprove(form.id)}
+                  variant="contained"
+                  color="success"
+                  startIcon={<CheckCircle />}
+                  sx={{ fontWeight: 600 }}
+                >
+                  Approve
+                </Button>
+                <Button 
+                  onClick={handleRejectClick}
+                  variant="contained"
+                  color="error"
+                  startIcon={<Cancel />}
+                  sx={{ fontWeight: 600 }}
+                >
+                  Reject
+                </Button>
+              </>
+            ) : (
+              <Typography variant="body2" color="textSecondary" sx={{ fontStyle: 'italic' }}>
+                Only authorized users can approve or reject forms
+              </Typography>
+            )}
           </>
         )}
       </DialogActions>
+
+      {/* Rejection Dialog */}
+      <Dialog
+        open={rejectionDialogOpen}
+        onClose={handleRejectionDialogClose}
+        aria-labelledby="rejection-dialog-title"
+        aria-describedby="rejection-dialog-description"
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle id="rejection-dialog-title">
+          Reject MCR Form
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="rejection-dialog-description" sx={{ mb: 2 }}>
+            Please provide a reason for rejecting this form. This information will be recorded and may be shared with the housing specialist.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Reason for Rejection"
+            type="text"
+            fullWidth
+            variant="outlined"
+            multiline
+            rows={4}
+            value={rejectionReason}
+            onChange={(e) => setRejectionReason(e.target.value)}
+            placeholder="Enter the reason for rejection..."
+            required
+            error={!rejectionReason.trim()}
+            helperText={!rejectionReason.trim() ? "Rejection reason is required" : ""}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={handleRejectionDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleRejectionSubmit} 
+            color="error" 
+            variant="contained"
+            disabled={!rejectionReason.trim()}
+          >
+            Reject Form
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };
