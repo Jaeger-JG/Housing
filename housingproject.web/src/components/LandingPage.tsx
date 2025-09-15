@@ -14,6 +14,7 @@ interface LandingPageProps {
   onNavigateToForm: () => void;
   onNavigateToDashboard: () => void;
   onNavigateToFormsList: () => void;
+  onNavigateToReports: () => void;
   onLogout?: () => void;
   username?: string;
 }
@@ -22,6 +23,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   onNavigateToForm, 
   onNavigateToDashboard,
   onNavigateToFormsList,
+  onNavigateToReports,
   onLogout,
   username
 }) => {
@@ -48,7 +50,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
     {
       icon: <Business sx={{ fontSize: 40, color: '#667eea' }} />,
       title: 'Reports',
-      description: 'Streamlined Reports for efficient housing administration'
+      description: 'Streamlined Reports for efficient housing administration',
+      onClick: onNavigateToReports
     },
     {
       icon: <Security sx={{ fontSize: 40, color: '#667eea' }} />,
@@ -60,7 +63,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   return (
     <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' }}>
       {/* Housing Menu */}
-      <HousingMenu onLogout={onLogout} username={username} onNavigateToForms={onNavigateToFormsList} onNavigateToDashboard={onNavigateToDashboard} />
+      <HousingMenu onLogout={onLogout} username={username} onNavigateToForms={onNavigateToFormsList} onNavigateToDashboard={onNavigateToDashboard} onNavigateToReports={onNavigateToReports} />
       
       {/* Sidebar Menu */}
       <SidebarMenu 

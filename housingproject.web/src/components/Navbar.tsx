@@ -7,9 +7,10 @@ interface NavbarProps {
   onLogout?: () => void;
   onNavigateToDashboard?: () => void;
   onNavigateToFormsList?: () => void;
+  onNavigateToReports?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onLogout, onNavigateToDashboard, onNavigateToFormsList }) => {
+const Navbar: React.FC<NavbarProps> = ({ onLogout, onNavigateToDashboard, onNavigateToFormsList, onNavigateToReports }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -72,6 +73,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout, onNavigateToDashboard, onNavi
         showMenuBar={false}
         onNavigateToDashboard={onNavigateToDashboard}
         onNavigateToForms={onNavigateToFormsList}
+        onNavigateToReports={onNavigateToReports}
       />
     </>
   );

@@ -55,6 +55,7 @@ interface MCRFormProps {
   onFormSubmitted?: () => void;
   onNavigateToDashboard?: () => void;
   onNavigateToFormsList?: () => void;
+  onNavigateToReports?: () => void;
   onLogout?: () => void;
 }
 
@@ -63,6 +64,7 @@ const MCRForm: React.FC<MCRFormProps> = ({
   onFormSubmitted, 
   onNavigateToDashboard, 
   onNavigateToFormsList, 
+  onNavigateToReports,
   onLogout 
 }) => {
   // Form state
@@ -360,6 +362,7 @@ const MCRForm: React.FC<MCRFormProps> = ({
         onLogout={onLogout || handleLogout} 
         onNavigateToDashboard={onNavigateToDashboard}
         onNavigateToFormsList={onNavigateToFormsList}
+        onNavigateToReports={onNavigateToReports}
       />
       
       <Box sx={{ 

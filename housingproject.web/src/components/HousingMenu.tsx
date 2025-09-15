@@ -5,7 +5,7 @@ const menuLinks = [
   { path: "/", label: "Home" },
   { path: "/dashboard", label: "Dashboard" },
   { path: "/mcr-form", label: "Forms" },
-  { path: "/about", label: "Reports" },
+  { path: "/reports", label: "Reports" },
   { path: "/contact", label: "Housing Portal" },
 ];
 
@@ -17,6 +17,7 @@ interface HousingMenuProps {
   username?: string;
   onNavigateToForms?: () => void;
   onNavigateToDashboard?: () => void;
+  onNavigateToReports?: () => void;
 }
 
 const HousingMenu: React.FC<HousingMenuProps> = ({ 
@@ -26,7 +27,8 @@ const HousingMenu: React.FC<HousingMenuProps> = ({
   showMenuBar = true,
   username,
   onNavigateToForms,
-  onNavigateToDashboard
+  onNavigateToDashboard,
+  onNavigateToReports
 }) => {
   const container = useRef<HTMLDivElement>(null);
   const [internalIsOpen, setInternalIsOpen] = useState(false);
@@ -108,6 +110,8 @@ const HousingMenu: React.FC<HousingMenuProps> = ({
                     onNavigateToForms();
                   } else if (link.label === 'Dashboard' && onNavigateToDashboard) {
                     onNavigateToDashboard();
+                  } else if (link.label === 'Reports' && onNavigateToReports) {
+                    onNavigateToReports();
                   }
                 }}>
                   <a 
@@ -119,6 +123,8 @@ const HousingMenu: React.FC<HousingMenuProps> = ({
                         onNavigateToForms();
                       } else if (link.label === 'Dashboard' && onNavigateToDashboard) {
                         onNavigateToDashboard();
+                      } else if (link.label === 'Reports' && onNavigateToReports) {
+                        onNavigateToReports();
                       }
                     }}
                   >

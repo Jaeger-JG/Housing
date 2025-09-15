@@ -5,6 +5,8 @@ import Login from './components/Login';
 import LandingPage from './components/LandingPage';
 import FormsList from './components/FormsList';
 import Dashboard from './components/Dashboard';
+import Reports from './components/Reports';
+import ReportViewer from './components/ReportViewer';
 
 function App() {
   const [selectedForm, setSelectedForm] = useState('landing');
@@ -12,6 +14,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [editingFormData, setEditingFormData] = useState(null);
+  const [selectedReportType, setSelectedReportType] = useState<string | null>(null);
 
   const handleLogin = async (username: string, password: string) => {
     setIsLoading(true);
@@ -59,6 +62,15 @@ function App() {
 
   const handleNavigateToFormsList = () => {
     setSelectedForm('forms-list');
+  };
+
+  const handleNavigateToReports = () => {
+    setSelectedForm('reports');
+  };
+
+  const handleNavigateToReportViewer = (reportType: string) => {
+    setSelectedReportType(reportType);
+    setSelectedForm('report-viewer');
   };
 
   const handleNavigateBack = () => {
@@ -130,6 +142,7 @@ function App() {
         onNavigateToForm={handleNavigateToForm}
         onNavigateToDashboard={handleNavigateToDashboard}
         onNavigateToFormsList={handleNavigateToFormsList}
+        onNavigateToReports={handleNavigateToReports}
         onLogout={handleLogout}
         username={localStorage.getItem('username') || undefined}
       />
@@ -158,6 +171,36 @@ function App() {
     );
   }
 
+  // If reports is selected, show it without the layout
+  if (selectedForm === 'reports') {
+    return (
+      <Reports 
+        onNavigateToForm={handleNavigateToForm}
+        onNavigateToFormsList={handleNavigateToFormsList}
+        onNavigateToDashboard={handleNavigateToDashboard}
+        onNavigateToReportViewer={handleNavigateToReportViewer}
+        onNavigateBack={handleNavigateBack}
+        onLogout={handleLogout}
+        username={localStorage.getItem('username') || undefined}
+      />
+    );
+  }
+
+  // If report viewer is selected, show it without the layout
+  if (selectedForm === 'report-viewer' && selectedReportType) {
+    return (
+      <ReportViewer 
+        reportType={selectedReportType}
+        onNavigateToForm={handleNavigateToForm}
+        onNavigateToFormsList={handleNavigateToFormsList}
+        onNavigateToDashboard={handleNavigateToDashboard}
+        onNavigateBack={() => setSelectedForm('reports')}
+        onLogout={handleLogout}
+        username={localStorage.getItem('username') || undefined}
+      />
+    );
+  }
+
   return (
     <Layout 
       onFormSelect={setSelectedForm} 
@@ -169,6 +212,7 @@ function App() {
           onFormSubmitted={() => setEditingFormData(null)}
           onNavigateToDashboard={handleNavigateToDashboard}
           onNavigateToFormsList={handleNavigateToFormsList}
+          onNavigateToReports={handleNavigateToReports}
           onLogout={handleLogout}
         />
       )}
